@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Analysis results",
-  description: "Your SEO Health Score and detailed check results.",
+  title: "Technical report",
+  description: "Your SEO health score, issues, and developer-oriented fixes.",
   robots: {
     index: false,
     follow: false,

@@ -2,40 +2,8 @@
 
 import { useId, useState } from "react";
 import { CodeExampleBlock } from "@/components/CodeExampleBlock";
-import type { CheckStatus, SeoCheckResult } from "@/lib/seo/types";
-
-function StatusIcon({ status }: { status: CheckStatus }) {
-  if (status === "pass") {
-    return (
-      <span
-        className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-800"
-        aria-label="Pass"
-      >
-        ✓
-      </span>
-    );
-  }
-
-  if (status === "warning") {
-    return (
-      <span
-        className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 text-amber-800"
-        aria-label="Warning"
-      >
-        ⚠
-      </span>
-    );
-  }
-
-  return (
-    <span
-      className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 text-red-800"
-      aria-label="Error"
-    >
-      ✗
-    </span>
-  );
-}
+import { StatusBadge } from "@/components/StatusBadge";
+import type { SeoCheckResult } from "@/lib/seo/types";
 
 export function CheckCard({ check }: { check: SeoCheckResult }) {
   const examplesId = useId();
@@ -43,47 +11,48 @@ export function CheckCard({ check }: { check: SeoCheckResult }) {
   const hasExamples = Boolean(check.fixExamples?.length);
 
   return (
-    <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="flex items-start gap-3">
-        <StatusIcon status={check.status} />
-        <div className="min-w-0 flex-1 space-y-2">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 className="text-base font-semibold text-slate-900">{check.title}</h3>
-            <span className="text-xs font-medium text-slate-500">
-              {check.score}/{check.maxScore} pts
-            </span>
-          </div>
-          <p className="text-sm text-slate-700">{check.message}</p>
-          <p className="text-sm text-slate-500">
-            <span className="font-medium text-slate-600">Recommendation: </span>
-            {check.recommendation}
-          </p>
+    <article className="border-b border-[var(--brand-border)] py-5 last:border-b-0">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-wrap items-center gap-2.5">
+          <h3 className="text-[15px] font-semibold tracking-[-0.01em] text-[var(--brand-ink)]">
+            {check.title}
+          </h3>
+          <StatusBadge status={check.status} />
+        </div>
+        <p className="font-[family-name:var(--font-mono)] text-[12px] tabular-nums text-[var(--brand-ink-tertiary)]">
+          {check.score}/{check.maxScore}
+        </p>
+      </div>
 
-          {hasExamples ? (
-            <div className="pt-1">
-              <button
-                type="button"
-                className="text-sm font-semibold text-teal-800 underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700"
-                aria-expanded={open}
-                aria-controls={examplesId}
-                onClick={() => setOpen((value) => !value)}
-              >
-                {open ? "Hide code examples" : "Show code examples"}
-              </button>
-              {open ? (
-                <div id={examplesId} className="mt-3 space-y-3">
-                  {check.fixExamples?.map((example) => (
-                    <CodeExampleBlock
-                      key={`${check.id}-${example.label}`}
-                      example={example}
-                    />
-                  ))}
-                </div>
-              ) : null}
+      <p className="mt-2.5 text-sm leading-relaxed text-[var(--brand-ink)]">{check.message}</p>
+      <p className="mt-2 text-sm leading-relaxed text-[var(--brand-ink-secondary)]">
+        <span className="font-medium text-[var(--brand-ink)]">Fix: </span>
+        {check.recommendation}
+      </p>
+
+      {hasExamples ? (
+        <div className="mt-3">
+          <button
+            type="button"
+            className="text-sm font-semibold text-[var(--brand-accent)] underline-offset-2 transition hover:underline focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+            aria-expanded={open}
+            aria-controls={examplesId}
+            onClick={() => setOpen((value) => !value)}
+          >
+            {open ? "Hide code examples" : "Show code examples"}
+          </button>
+          {open ? (
+            <div id={examplesId} className="mt-3 space-y-3">
+              {check.fixExamples?.map((example) => (
+                <CodeExampleBlock
+                  key={`${check.id}-${example.label}`}
+                  example={example}
+                />
+              ))}
             </div>
           ) : null}
         </div>
-      </div>
+      ) : null}
     </article>
   );
 }

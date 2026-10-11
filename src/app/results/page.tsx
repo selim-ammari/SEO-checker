@@ -8,25 +8,32 @@ import { ScoreRing } from "@/components/ScoreRing";
 import { loadAnalysisResult } from "@/lib/client/analysis-storage";
 import type { AnalysisResult } from "@/lib/seo/types";
 
-function FrameworkBadge({ result }: { result: AnalysisResult }) {
+function hostnameOf(url: string): string {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return url;
+  }
+}
+
+function FrameworkMeta({ result }: { result: AnalysisResult }) {
   const framework = result.framework;
   if (!framework || framework.framework === "unknown") {
     return (
-      <p className="text-sm text-slate-500">
-        Framework: Unknown — Next.js examples are shown as optional guidance.
-      </p>
+      <span className="text-[var(--brand-ink-tertiary)]">
+        Framework unknown · Next.js examples shown as optional guidance
+      </span>
     );
   }
 
   return (
-    <p className="text-sm text-slate-600">
-      Framework:{" "}
-      <span className="font-semibold text-slate-900">{framework.label}</span>
-      <span className="text-slate-500">
+    <span>
+      <span className="font-medium text-[var(--brand-ink)]">{framework.label}</span>
+      <span className="text-[var(--brand-ink-tertiary)]">
         {" "}
         · confidence {framework.confidence}
       </span>
-    </p>
+    </span>
   );
 }
 
@@ -41,25 +48,24 @@ export default function ResultsPage() {
 
   if (!ready) {
     return (
-      <div className="mx-auto w-full max-w-5xl px-4 py-16 sm:px-6">
-        <p className="text-slate-600">Loading results…</p>
+      <div className="shell py-20">
+        <p className="text-sm text-[var(--brand-ink-secondary)]" role="status">
+          Loading report…
+        </p>
       </div>
     );
   }
 
   if (!result) {
     return (
-      <div className="mx-auto w-full max-w-5xl px-4 py-16 sm:px-6">
-        <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold text-slate-900">
-          No analysis found
-        </h1>
-        <p className="mt-3 text-slate-600">
-          Run a new check from the home page to see your SEO Health Score.
+      <div className="shell py-20">
+        <p className="eyebrow">Results</p>
+        <h1 className="section-title mt-3">No analysis found</h1>
+        <p className="body-muted mt-3 max-w-md">
+          Run a new check from the home page to generate a technical SEO report. Results
+          are stored in this browser session only.
         </p>
-        <Link
-          href="/"
-          className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-teal-700 px-5 font-semibold text-white transition hover:bg-teal-800"
-        >
+        <Link href="/#analyze" className="btn-primary mt-8 inline-flex">
           Analyze a website
         </Link>
       </div>
@@ -68,61 +74,82 @@ export default function ResultsPage() {
 
   const issues = result.checks.filter((c) => c.status !== "pass");
   const passed = result.checks.filter((c) => c.status === "pass");
+  const domain = hostnameOf(result.finalUrl || result.url);
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
-      <section className="flex flex-col items-center gap-8 rounded-3xl border border-slate-200 bg-white/80 p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-8">
-        <div className="min-w-0 flex-1 space-y-3 text-center sm:text-left">
-          <p className="text-sm font-semibold uppercase tracking-wide text-teal-800">
-            SEO Health Score
-          </p>
-          <h1 className="font-[family-name:var(--font-display)] text-3xl font-semibold text-slate-900 sm:text-4xl">
-            {result.grade}
+    <div className="shell py-8 sm:py-12">
+      <div className="flex flex-col gap-4 border-b border-[var(--brand-border)] pb-6 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
+          <p className="eyebrow">Technical report</p>
+          <h1 className="mt-2 truncate text-2xl font-semibold tracking-[-0.03em] text-[var(--brand-ink)] sm:text-3xl">
+            {domain}
           </h1>
-          <p className="break-all text-sm text-slate-600">
-            Analyzed:{" "}
+          <p className="mt-2 break-all font-[family-name:var(--font-mono)] text-[12px] text-[var(--brand-ink-tertiary)]">
             <a
               href={result.finalUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium text-teal-800 underline-offset-2 hover:underline"
+              className="underline-offset-2 hover:text-[var(--brand-accent)] hover:underline"
             >
               {result.finalUrl}
             </a>
           </p>
-          <FrameworkBadge result={result} />
-          <p className="text-sm text-slate-500">
-            {result.summary.passed} passed · {result.summary.warnings} warnings ·{" "}
-            {result.summary.errors} errors
-          </p>
-          {result.analyzedAt ? (
-            <p className="text-xs text-slate-400">
-              Analyzed at {new Date(result.analyzedAt).toLocaleString()}
-            </p>
-          ) : null}
+          <div className="mt-3 flex flex-col gap-1 text-sm text-[var(--brand-ink-secondary)] sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3">
+            <FrameworkMeta result={result} />
+            {result.analyzedAt ? (
+              <>
+                <span className="hidden text-[var(--brand-border-strong)] sm:inline" aria-hidden>
+                  |
+                </span>
+                <time dateTime={result.analyzedAt}>
+                  {new Date(result.analyzedAt).toLocaleString()}
+                </time>
+              </>
+            ) : null}
+          </div>
         </div>
-        <ScoreRing score={result.score} grade={result.grade} />
-      </section>
 
-      <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-        <Link
-          href="/"
-          className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
-        >
-          Analyze another website
-        </Link>
-        <ExportButtons result={result} />
+        <div className="flex flex-col gap-2 sm:items-end">
+          <ExportButtons result={result} />
+          <Link href="/#analyze" className="btn-ghost justify-start px-0 text-[13px] sm:justify-end">
+            Analyze another website
+          </Link>
+        </div>
       </div>
 
-      {issues.length > 0 ? (
-        <section className="mt-10">
-          <h2 className="font-[family-name:var(--font-display)] text-2xl font-semibold text-slate-900">
-            SEO issues
+      <section className="grid gap-8 border-b border-[var(--brand-border)] py-8 sm:grid-cols-[auto_1fr] sm:items-center sm:gap-12">
+        <ScoreRing score={result.score} grade={result.grade} />
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--brand-ink-tertiary)]">
+            SEO health score
+          </p>
+          <h2 className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-[var(--brand-ink)]">
+            {result.grade}
           </h2>
-          <p className="mt-2 text-sm text-slate-600">
+          <p className="body-muted mt-2 max-w-xl text-sm">
+            {result.summary.passed} passed · {result.summary.warnings} warnings ·{" "}
+            {result.summary.errors} errors across {result.checks.length} technical checks.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2 text-[12px]">
+            <span className="status-pill-pass">{result.summary.passed} pass</span>
+            <span className="status-pill-warning">{result.summary.warnings} warn</span>
+            <span className="status-pill-error">{result.summary.errors} error</span>
+          </div>
+        </div>
+      </section>
+
+      {issues.length > 0 ? (
+        <section className="py-8">
+          <div className="mb-2 flex items-baseline justify-between gap-4">
+            <h2 className="section-title">Issues requiring attention</h2>
+            <p className="font-[family-name:var(--font-mono)] text-[12px] text-[var(--brand-ink-tertiary)]">
+              {issues.length}
+            </p>
+          </div>
+          <p className="body-muted mb-2 max-w-2xl text-sm">
             Recommended actions and optional code examples for developers.
           </p>
-          <div className="mt-5 grid gap-4">
+          <div className="panel px-4 sm:px-5">
             {issues.map((check) => (
               <CheckCard key={check.id} check={check} />
             ))}
@@ -130,11 +157,16 @@ export default function ResultsPage() {
         </section>
       ) : null}
 
-      <section className="mt-10">
-        <h2 className="font-[family-name:var(--font-display)] text-2xl font-semibold text-slate-900">
-          {issues.length > 0 ? "Passed checks" : "All checks"}
-        </h2>
-        <div className="mt-5 grid gap-4">
+      <section className={issues.length > 0 ? "pb-8" : "py-8"}>
+        <div className="mb-2 flex items-baseline justify-between gap-4">
+          <h2 className="section-title">
+            {issues.length > 0 ? "Passed checks" : "All checks"}
+          </h2>
+          <p className="font-[family-name:var(--font-mono)] text-[12px] text-[var(--brand-ink-tertiary)]">
+            {issues.length > 0 ? passed.length : result.checks.length}
+          </p>
+        </div>
+        <div className="panel px-4 sm:px-5">
           {(issues.length > 0 ? passed : result.checks).map((check) => (
             <CheckCard key={check.id} check={check} />
           ))}

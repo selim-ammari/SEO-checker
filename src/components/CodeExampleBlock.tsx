@@ -10,7 +10,7 @@ async function copyText(text: string): Promise<boolean> {
       return true;
     }
   } catch {
-    // fall through to legacy path
+    // fall through
   }
 
   try {
@@ -39,23 +39,27 @@ export function CodeExampleBlock({ example }: { example: CodeExample }) {
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 px-3 py-2">
-        <p className="text-xs font-semibold text-slate-700">{example.label}</p>
+    <div className="overflow-hidden rounded-[var(--radius-md)] border border-[var(--code-border)] bg-[var(--code-bg)]">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--code-border)] px-3 py-2">
+        <p className="font-[family-name:var(--font-mono)] text-[11px] font-medium text-[var(--code-muted)]">
+          {example.label}
+        </p>
         <button
           type="button"
           onClick={onCopy}
-          className="rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700"
+          className="rounded-[var(--radius-sm)] border border-white/10 bg-white/5 px-2.5 py-1 font-[family-name:var(--font-mono)] text-[11px] font-semibold text-[var(--code-fg)] transition hover:bg-white/10 focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
           aria-label={`Copy code example: ${example.label}`}
         >
-          {feedback === "copied" ? "Copied" : feedback === "failed" ? "Copy failed" : "Copy"}
+          {feedback === "copied" ? "Copied" : feedback === "failed" ? "Failed" : "Copy"}
         </button>
       </div>
-      <pre className="overflow-x-auto p-3 text-xs leading-relaxed text-slate-800">
+      <pre className="overflow-x-auto p-3.5 font-[family-name:var(--font-mono)] text-[12px] leading-relaxed text-[var(--code-fg)]">
         <code>{example.code}</code>
       </pre>
       {example.note ? (
-        <p className="border-t border-slate-200 px-3 py-2 text-xs text-slate-500">{example.note}</p>
+        <p className="border-t border-[var(--code-border)] px-3.5 py-2 text-[11px] leading-relaxed text-[var(--code-muted)]">
+          {example.note}
+        </p>
       ) : null}
       <span className="sr-only" aria-live="polite">
         {feedback === "copied" ? "Code copied to clipboard" : ""}

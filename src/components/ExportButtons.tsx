@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   buildExportFilename,
   toJsonReport,
@@ -20,32 +21,60 @@ function downloadTextFile(filename: string, content: string, mimeType: string): 
   URL.revokeObjectURL(url);
 }
 
+function FileIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
+      <path
+        d="M4 1.75h5.5L13 5.25v9A1.25 1.25 0 0 1 11.75 15.5h-7.5A1.25 1.25 0 0 1 3 14.25v-11A1.25 1.25 0 0 1 4.25 2"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.25 1.75V5.5H13"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M6 9.5h4M6 12h2.5"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 export function ExportButtons({ result }: { result: AnalysisResult }) {
+  const [feedback, setFeedback] = useState<"idle" | "md" | "json">("idle");
+
+  function flash(kind: "md" | "json") {
+    setFeedback(kind);
+    window.setTimeout(() => setFeedback("idle"), 1600);
+  }
+
   function downloadMarkdown() {
     const filename = buildExportFilename(result, "md");
     downloadTextFile(filename, toMarkdownReport(result), "text/markdown;charset=utf-8");
+    flash("md");
   }
 
   function downloadJson() {
     const filename = buildExportFilename(result, "json");
     downloadTextFile(filename, toJsonReport(result), "application/json;charset=utf-8");
+    flash("json");
   }
 
   return (
-    <div className="flex flex-wrap gap-3">
-      <button
-        type="button"
-        onClick={downloadMarkdown}
-        className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700"
-      >
-        Download Markdown
+    <div className="flex flex-wrap gap-2">
+      <button type="button" onClick={downloadMarkdown} className="btn-secondary px-3.5 text-[13px]">
+        <FileIcon />
+        {feedback === "md" ? "Downloaded" : "Markdown"}
       </button>
-      <button
-        type="button"
-        onClick={downloadJson}
-        className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700"
-      >
-        Download JSON
+      <button type="button" onClick={downloadJson} className="btn-secondary px-3.5 text-[13px]">
+        <FileIcon />
+        {feedback === "json" ? "Downloaded" : "JSON"}
       </button>
     </div>
   );

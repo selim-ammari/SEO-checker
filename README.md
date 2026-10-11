@@ -1,6 +1,6 @@
-# SEO Checker
+# DevSEO
 
-Free micro-SaaS that analyzes a single public URL and returns an **SEO Health Score / 100** with clear issues and recommendations.
+Technical SEO checker for developers. Analyzes a single public URL and returns an **SEO Health Score / 100** with issues, recommendations, and optional Next.js App Router code examples.
 
 ## Stack
 

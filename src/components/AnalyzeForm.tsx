@@ -57,8 +57,8 @@ export function AnalyzeForm({ initialUrl = "" }: { initialUrl?: string }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="w-full space-y-3">
-      <div className="flex flex-col gap-3 sm:flex-row">
+    <form onSubmit={onSubmit} className="w-full space-y-3" id="analyze-form">
+      <div className="flex flex-col gap-2.5 sm:flex-row sm:items-stretch">
         <label className="sr-only" htmlFor="url">
           Website URL
         </label>
@@ -72,25 +72,38 @@ export function AnalyzeForm({ initialUrl = "" }: { initialUrl?: string }) {
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           disabled={loading}
-          className="min-h-12 flex-1 rounded-xl border border-slate-300 bg-white px-4 text-base text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20 disabled:opacity-60"
+          className="field font-[family-name:var(--font-mono)] text-[14px] sm:flex-1"
         />
-        <button
-          type="submit"
-          disabled={loading}
-          className="min-h-12 rounded-xl bg-teal-700 px-6 text-base font-semibold text-white transition hover:bg-teal-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {loading ? "Analyzing…" : "Analyze website"}
+        <button type="submit" disabled={loading} className="btn-primary min-w-[10.5rem] px-5">
+          {loading ? (
+            <span className="inline-flex items-center gap-2">
+              <span
+                className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white"
+                aria-hidden
+              />
+              Analyzing…
+            </span>
+          ) : (
+            "Analyze website"
+          )}
         </button>
       </div>
 
       {loading ? (
-        <p className="text-sm text-slate-600" role="status" aria-live="polite">
-          Analyzing website…
+        <p className="text-sm text-[var(--brand-ink-secondary)]" role="status" aria-live="polite">
+          Fetching HTML and running technical checks…
         </p>
-      ) : null}
+      ) : (
+        <p className="text-sm text-[var(--brand-ink-tertiary)]">
+          Public pages only · HTTPS preferred · Single-page HTML analysis
+        </p>
+      )}
 
       {error ? (
-        <p className="text-sm text-red-700" role="alert">
+        <p
+          className="rounded-[var(--radius-sm)] bg-[var(--status-error-bg)] px-3 py-2 text-sm text-[var(--status-error)] ring-1 ring-[var(--status-error-border)]"
+          role="alert"
+        >
           {error}
         </p>
       ) : null}
