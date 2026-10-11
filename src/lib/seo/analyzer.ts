@@ -8,6 +8,8 @@ import { checkOpenGraph } from "@/lib/seo/checks/open-graph";
 import { checkRobots } from "@/lib/seo/checks/robots";
 import { checkSitemap } from "@/lib/seo/checks/sitemap";
 import { checkTitle } from "@/lib/seo/checks/title";
+import { detectFramework } from "@/lib/seo/detect-framework";
+import { enrichChecksWithRecommendations } from "@/lib/seo/recommendations";
 import {
   calculateOverallScore,
   getGrade,
@@ -17,8 +19,9 @@ import type { AnalysisResult, AnalyzePageInput } from "@/lib/seo/types";
 
 export function analyzePage(input: AnalyzePageInput): AnalysisResult {
   const $ = cheerio.load(input.html);
+  const framework = detectFramework($);
 
-  const checks = [
+  const baseChecks = [
     checkHttps(input.isHttps),
     checkTitle($),
     checkMetaDescription($),
@@ -31,6 +34,7 @@ export function analyzePage(input: AnalyzePageInput): AnalysisResult {
     checkSitemap(input.sitemapExists),
   ];
 
+  const checks = enrichChecksWithRecommendations(baseChecks, framework);
   const score = calculateOverallScore(checks);
 
   return {
@@ -40,5 +44,6 @@ export function analyzePage(input: AnalyzePageInput): AnalysisResult {
     grade: getGrade(score),
     checks,
     summary: summarizeChecks(checks),
+    framework,
   };
 }

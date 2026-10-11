@@ -64,3 +64,39 @@ export const multipleH1Html = `
 </body>
 </html>
 `;
+
+export const nextJsHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Next App Demo Page for Framework Detection</title>
+  <meta name="description" content="A representative Next.js HTML document used to verify conservative framework detection in our SEO checker." />
+  <meta name="generator" content="Next.js 15.0" />
+  <link rel="canonical" href="https://example.com/" />
+  <meta property="og:title" content="Next App" />
+  <meta property="og:description" content="Demo" />
+  <meta property="og:image" content="https://example.com/og.png" />
+  <script src="/_next/static/chunks/main.js"></script>
+</head>
+<body>
+  <div id="__next">
+    <h1>Welcome</h1>
+    <script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{}}}</script>
+  </div>
+</body>
+</html>
+`;
+
+export const nuxtHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Nuxt App Demo Page for Framework Detection</title>
+  <script src="/_nuxt/entry.js"></script>
+</head>
+<body>
+  <div id="__nuxt"></div>
+  <script>window.__NUXT__={};</script>
+</body>
+</html>
+`;

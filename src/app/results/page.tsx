@@ -3,9 +3,32 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CheckCard } from "@/components/CheckCard";
+import { ExportButtons } from "@/components/ExportButtons";
 import { ScoreRing } from "@/components/ScoreRing";
 import { loadAnalysisResult } from "@/lib/client/analysis-storage";
 import type { AnalysisResult } from "@/lib/seo/types";
+
+function FrameworkBadge({ result }: { result: AnalysisResult }) {
+  const framework = result.framework;
+  if (!framework || framework.framework === "unknown") {
+    return (
+      <p className="text-sm text-slate-500">
+        Framework: Unknown — Next.js examples are shown as optional guidance.
+      </p>
+    );
+  }
+
+  return (
+    <p className="text-sm text-slate-600">
+      Framework:{" "}
+      <span className="font-semibold text-slate-900">{framework.label}</span>
+      <span className="text-slate-500">
+        {" "}
+        · confidence {framework.confidence}
+      </span>
+    </p>
+  );
+}
 
 export default function ResultsPage() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
@@ -67,21 +90,28 @@ export default function ResultsPage() {
               {result.finalUrl}
             </a>
           </p>
+          <FrameworkBadge result={result} />
           <p className="text-sm text-slate-500">
             {result.summary.passed} passed · {result.summary.warnings} warnings ·{" "}
             {result.summary.errors} errors
           </p>
+          {result.analyzedAt ? (
+            <p className="text-xs text-slate-400">
+              Analyzed at {new Date(result.analyzedAt).toLocaleString()}
+            </p>
+          ) : null}
         </div>
         <ScoreRing score={result.score} grade={result.grade} />
       </section>
 
-      <div className="mt-8">
+      <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
         <Link
           href="/"
-          className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
+          className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
         >
           Analyze another website
         </Link>
+        <ExportButtons result={result} />
       </div>
 
       {issues.length > 0 ? (
@@ -89,6 +119,9 @@ export default function ResultsPage() {
           <h2 className="font-[family-name:var(--font-display)] text-2xl font-semibold text-slate-900">
             SEO issues
           </h2>
+          <p className="mt-2 text-sm text-slate-600">
+            Recommended actions and optional code examples for developers.
+          </p>
           <div className="mt-5 grid gap-4">
             {issues.map((check) => (
               <CheckCard key={check.id} check={check} />

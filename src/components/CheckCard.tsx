@@ -1,3 +1,7 @@
+"use client";
+
+import { useId, useState } from "react";
+import { CodeExampleBlock } from "@/components/CodeExampleBlock";
 import type { CheckStatus, SeoCheckResult } from "@/lib/seo/types";
 
 function StatusIcon({ status }: { status: CheckStatus }) {
@@ -34,6 +38,10 @@ function StatusIcon({ status }: { status: CheckStatus }) {
 }
 
 export function CheckCard({ check }: { check: SeoCheckResult }) {
+  const examplesId = useId();
+  const [open, setOpen] = useState(false);
+  const hasExamples = Boolean(check.fixExamples?.length);
+
   return (
     <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex items-start gap-3">
@@ -50,6 +58,30 @@ export function CheckCard({ check }: { check: SeoCheckResult }) {
             <span className="font-medium text-slate-600">Recommendation: </span>
             {check.recommendation}
           </p>
+
+          {hasExamples ? (
+            <div className="pt-1">
+              <button
+                type="button"
+                className="text-sm font-semibold text-teal-800 underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700"
+                aria-expanded={open}
+                aria-controls={examplesId}
+                onClick={() => setOpen((value) => !value)}
+              >
+                {open ? "Hide code examples" : "Show code examples"}
+              </button>
+              {open ? (
+                <div id={examplesId} className="mt-3 space-y-3">
+                  {check.fixExamples?.map((example) => (
+                    <CodeExampleBlock
+                      key={`${check.id}-${example.label}`}
+                      example={example}
+                    />
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
         </div>
       </div>
     </article>

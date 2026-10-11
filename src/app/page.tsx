@@ -24,7 +24,8 @@ export default function HomePage() {
           Free SEO Website Checker
         </h1>
         <p className="mt-4 text-lg text-slate-600">
-          Analyze your website&apos;s SEO health in seconds.
+          Find technical SEO issues and get actionable fixes for your code —
+          especially useful for Next.js App Router projects.
         </p>
 
         <div className="mt-8 text-left">

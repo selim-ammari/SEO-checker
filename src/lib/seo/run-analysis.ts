@@ -95,7 +95,13 @@ export async function runAnalysis(rawUrl: string): Promise<
       sitemapExists,
     });
 
-    return { ok: true, data };
+    return {
+      ok: true,
+      data: {
+        ...data,
+        analyzedAt: new Date().toISOString(),
+      },
+    };
   } catch (error) {
     return { ok: false, error: mapError(error) };
   }
